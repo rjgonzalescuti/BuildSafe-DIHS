@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>
+        BuildSafe DIHS - Inventory
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+    <link rel="stylesheet" href="theme.css">
+
+</head>
+
+
+<body>
+
+<div class="dashboard">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="inventory-sidebar">
+
+        <h2>
+            BuildSafe DIHS
+        </h2>
+
+        <p>
+            Digital Classroom Inventory System
+        </p>
+
+
+        <button>
+            Inventory
+        </button>
+
+
+        <button
+    id="reportsNavButton"
+    data-role="teacher"
+    onclick="document.getElementById('reportSection').scrollIntoView({behavior:'smooth'})">
+
+    Reports
+
+</button>
+
+
+        <button
+            onclick="logout()">
+
+            Logout
+
+        </button>
+
+    </aside>
+
+
+
+    <!-- MAIN INVENTORY PAGE -->
+
+    <div class="inventory-page">
+
+
+        <!-- ROOM INFORMATION -->
+
+        <div class="room-info-box">
+
+            <div class="inventory-header">
+
+                <div>
+
+                    <h1 id="roomTitle">
+                        Room 18
+                    </h1>
+
+                    <p id="roomAdviser">
+                        Building 17 | Room Adviser: Teacher Name
+                    </p>
+
+                </div>
+
+
+            <button onclick="goToDashboard()">
+                 ← Back to Dashboard
+</button>
+
+            </div>
+
+
+
+            <!-- ROOM PHOTO -->
+
+            <div class="room-photo-section">
+
+                <img
+                    id="roomPhoto"
+                    src="school-bg.jpg"
+                    alt="Classroom Photo"
+                    class="room-photo"
+                >
+
+
+                <label
+                    for="photoInput"
+                    class="change-photo">
+
+                    Change Photo
+
+                </label>
+
+
+                <input
+                    type="file"
+                    id="photoInput"
+                    accept="image/*"
+                    onchange="changeRoomPhoto(event)"
+                    hidden
+                >
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             CLASSROOM INVENTORY
+        ================================================= -->
+
+        <div class="inventory-section">
+
+            <h2>
+                Classroom Inventory
+            </h2>
+
+
+            <div class="table-wrap">
+
+                <table class="inventory-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Item
+                            </th>
+
+                            <th>
+                                Quantity
+                            </th>
+
+                            <th>
+                                Damage / Defect
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="inventoryTableBody">
+
+                        <!-- Inventory items will be loaded by app.js -->
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+
+            <!-- INVENTORY BUTTONS -->
+
+            <div class="inventory-actions">
+
+                <button
+                    id="updateInventoryButton"
+                    onclick="enableInventoryEdit()">
+
+                    Update Inventory
+
+                </button>
+
+
+                <button
+                    id="saveInventoryButton"
+                    onclick="saveInventoryChanges()"
+                    style="display: none;">
+
+                    Save Changes
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             MAINTENANCE HISTORY
+        ================================================= -->
+
+        <div class="maintenance-list">
+
+            <h2>
+                Maintenance History
+            </h2>
+
+
+            <div class="maintenance-table-wrap">
+
+                <table class="maintenance-history-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Defect Item
+                            </th>
+
+                            <th>
+                                Quantity
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Last Updated
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="maintenanceReports">
+
+                        <tr>
+
+                            <td colspan="4">
+                                No maintenance history for this room yet.
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             REPORT SECTION
+        ================================================= -->
+
+        <div
+    class="inventory-section"
+    id="reportSection"
+    data-role="teacher">
+
+            <h2>
+                Report a Classroom Defect
+            </h2>
+
+
+            <p>
+                Teachers and Room Advisers can report
+                damaged or defective classroom items.
+            </p>
+
+
+
+            <form
+                id="reportForm"
+                onsubmit="submitReport(event)">
+
+
+                <!-- ITEM -->
+
+                <label for="reportItem">
+                    Item / Facility
+                </label>
+
+
+                <select
+                    id="reportItem"
+                    required>
+
+                    <option value="">
+                        Select item
+                    </option>
+
+                    <option>
+                        Armchairs
+                    </option>
+
+                    <option>
+                        Tables
+                    </option>
+
+                    <option>
+                        Door
+                    </option>
+
+                    <option>
+                        Windows
+                    </option>
+
+                    <option>
+                        Lights
+                    </option>
+
+                    <option>
+                        Electrical Outlets
+                    </option>
+
+                    <option>
+                        Electric Fans
+                    </option>
+
+                    <option>
+                        Other
+                    </option>
+
+                </select>
+
+                <div id="reportExtra"></div>
+
+
+
+
+                <!-- QUANTITY -->
+
+                <label for="reportQuantity">
+                    Quantity Affected
+                </label>
+
+
+                <input
+                    type="number"
+                    id="reportQuantity"
+                    min="1"
+                    placeholder="How many are affected"
+                    required
+                >
+
+
+
+                <!-- TYPE -->
+
+                <label for="reportType">
+                    Type of Concern
+                </label>
+
+
+                <select
+                    id="reportType"
+                    required>
+
+                    <option value="">
+                        Select concern
+                    </option>
+
+                    <option>
+                        Damaged
+                    </option>
+
+                    <option>
+                        Broken
+                    </option>
+
+                    <option>
+                        Missing
+                    </option>
+
+                    <option>
+                        Safety Concern
+                    </option>
+
+                    <option>
+                        Other
+                    </option>
+
+                </select>
+
+
+
+                <!-- DESCRIPTION -->
+
+                <label for="reportDescription">
+                    Description
+                </label>
+
+
+                <textarea
+                    id="reportDescription"
+                    placeholder="Describe the problem..."
+                    required></textarea>
+
+
+
+                <!-- PHOTO -->
+
+                <label for="reportPhoto">
+                    Attach Photo
+                </label>
+
+
+                <input
+                    type="file"
+                    id="reportPhoto"
+                    accept="image/*"
+                >
+
+
+
+                <!-- BUTTONS -->
+
+                <div class="defect-buttons">
+
+                    <button
+                        type="submit">
+
+                        Submit Report
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        onclick="document.getElementById('reportForm').reset()">
+
+                        Cancel
+
+                    </button>
+
+                </div>
+
+
+            </form>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<script src="firebase-config.js"></script>
+<script src="store.js"></script>
+<script src="app.js"></script>
+
+</body>
+
+</html>

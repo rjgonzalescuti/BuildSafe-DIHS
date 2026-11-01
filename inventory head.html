@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BuildSafe DIHS - Inventory</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="inventory-sidebar">
+
+        <h2>BuildSafe DIHS</h2>
+
+        <p>Digital Classroom Inventory System</p>
+
+        <button>
+            Inventory
+        </button>
+        
+        <button onclick="document.getElementById('reportSection').scrollIntoView({behavior:'smooth'})"> Reports </button>
+
+        <button onclick="logout()">
+            Logout
+        </button>
+
+    </aside>
+
+
+    <!-- MAIN INVENTORY PAGE -->
+    <div class="inventory-page">
+
+
+        <!-- ROOM INFORMATION -->
+        <div class="room-info-box">
+
+            <div class="inventory-header">
+
+                <div>
+
+                    <h1 id="roomTitle">Room 18</h1>
+
+                    <p id="roomAdviser">
+                        Building 17 | Room Adviser: Teacher Name
+                    </p>
+
+                </div>
+
+                <button onclick="window.location.href='dashboard.html'">
+                    ← Back to Dashboard
+                </button>
+
+            </div>
+
+
+            <!-- ROOM PHOTO -->
+            <div class="room-photo-section">
+
+                <img
+                    id="roomPhoto"
+                    src="school-bg.jpg"
+                    alt="Classroom Photo"
+                    class="room-photo"
+                >
+
+                <label
+                    for="photoInput"
+                    class="change-photo">
+                    Change Photo
+                </label>
+
+                <input
+                    type="file"
+                    id="photoInput"
+                    accept="image/*"
+                    onchange="changeRoomPhoto(event)"
+                    hidden
+                >
+
+            </div>
+
+        </div>
+
+
+
+        <!-- CLASSROOM INVENTORY -->
+        <div class="inventory-section">
+
+            <h2>Classroom Inventory</h2>
+
+
+            <div class="table-wrap">
+
+                <table class="inventory-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Damage / Defect</th>
+                            <th>Status</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                        <!-- ARMCHAIRS -->
+                        <tr data-item="Armchairs">
+
+                            <td>Armchairs</td>
+
+                            <td>
+                                <input
+                                    type="number"
+                                    value="30"
+                                    disabled
+                                >
+                            </td>
+
+                            <td>
+                                <input
+                                    type="text"
+                                    value="2 broken"
+                                    disabled
+                                >
+                            </td>
+
+                            <td>
+                                <span class="status locked">
+                                    Good
+                                </span>
+                            </td>
+
+                        </tr>
+
+
+                        <!-- TABLES -->
+                        <tr data-item="Tables">
+
+                            <td>Tables</td>
+
+                            <td>
+                                <input
+                                    type="number"
+                                    value="5"
+                                    disabled
+                                >
+                            </td>
+
+                            <td>
+                                <input
+                                    type="text"
+                                    value="None"
+                                    disabled
+                                >
+                            </td>
+
+                            <td>
+                                <span class="status locked">
+                                    Good
+                                </span>
+                            </td>
+
+                        </tr>
+
+
+                        <!-- DOOR -->
+                        <tr data-item="Door">
+
+                            <td>Door</td>
+
+                            <td>
+                                <input
+                                    type="number"
+                                    value="1"
+                                    disabled
+                                >
+                            </td>
+
+                            <td>
+                                <input
+                                    type="text"
+                                    value="Lock damaged"
+                                    disabled
+                                >
+                            </td>
+
+                            <td>
+                                <span class="status locked">
+                                    Needs Repair
+                                </span>
+                            </td>
+
+                        </tr>
+
+
+                        <!-- WINDOWS -->
+                        <tr data-item="Windows">
+
+                            <td>Windows</td>
+
+                            <td>
+                                <input
+                                    type="number"
+                                    value="8"
+                                    disabled
+                                >
+                            </td>
+
+                            <td>
+                                <input
+                                    type="text"
+                                    value="2 broken panes"
+                                    disabled
+                                >
+                            </td>
+
+                            <td>
+                                <span class="status locked">
+                                    Needs Repair
+                                </span>
+                            </td>
+
+                        </tr>
+
+
+                        <!-- LIGHTS -->
+                        <tr data-item="Lights">
+
+                            <td>Lights</td>
+
+                            <td>
+                                <input
+                                    type="number"
+                                    value="6"
+                                    disabled
+                                >
+                            </td>
+
+                            <td>
+                                <input
+                                    type="text"
+                                    value="None"
+                                    disabled
+                                >
+                            </td>
+
+                            <td>
+                                <span class="status locked">
+                                    Good
+                                </span>
+                            </td>
+
+                        </tr>
+
+
+                        <!-- ELECTRICAL OUTLETS -->
+                        <tr data-item="Electrical Outlets">
+
+                            <td>Electrical Outlets</td>
+
+                            <td>
+                                <input
+                                    type="number"
+                                    value="4"
+                                    disabled
+                                >
+                            </td>
+
+                            <td>
+                                <input
+                                    type="text"
+                                    value="1 defective"
+                                    disabled
+                                >
+                            </td>
+
+                            <td>
+                                <span class="status locked">
+                                    Needs Repair
+                                </span>
+                            </td>
+
+                        </tr>
+
+
+                        <!-- ELECTRIC FANS -->
+                        <tr data-item="Electric Fans">
+
+                            <td>Electric Fans</td>
+
+                            <td>
+                                <input
+                                    type="number"
+                                    value="4"
+                                    disabled
+                                >
+                            </td>
+
+                            <td>
+                                <input
+                                    type="text"
+                                    value="1 not working"
+                                    disabled
+                                >
+                            </td>
+
+                            <td>
+                                <span class="status locked">
+                                    Damaged
+                                </span>
+                            </td>
+
+                        </tr>
+
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- INVENTORY BUTTONS -->
+            <div class="inventory-actions">
+
+                <button
+                    id="updateInventoryButton"
+                    onclick="enableInventoryEdit()">
+                    Update Inventory
+                </button>
+
+                <button
+                    id="saveInventoryButton"
+                    onclick="saveInventory()"
+                    style="display: none;">
+                    Save Changes
+                </button>
+
+            </div>
+
+        </div>
+
+

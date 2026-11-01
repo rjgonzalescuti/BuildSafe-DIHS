@@ -1,0 +1,124 @@
+rules_version = '2';
+
+// BuildSafe DIHS — Firestore security rules
+//
+// Every signed-in person has a document users/{their uid} with a role:
+//   "schoolHead"  or  "teacher"
+// You create these documents yourself in the Firebase console
+// (see FIREBASE-SETUP.md). The app can never create or change them.
+//
+//   teacher     can read everything, add classrooms, edit room inventory
+//               and photos, and submit new defect reports
+//   schoolHead  can read everything, add classrooms, edit room inventory
+//               and photos, and verify reports / update their maintenance status
+//
+// Nobody can delete anything.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- who is asking? ----------
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function profilePath() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+
+    function hasRole(role) {
+      return signedIn()
+        && exists(profilePath())
+        && get(profilePath()).data.role == role;
+    }
+
+    function isHead()    { return hasRole('schoolHead'); }
+    function isTeacher() { return hasRole('teacher'); }
+    function isMember()  { return isHead() || isTeacher(); }
+
+    // Photos are stored as compressed text inside the document.
+    function photoOk(data) {
+      return !('photo' in data)
+        || (data.photo is string && data.photo.size() < 900000);
+    }
+
+
+    // ---------- profiles ----------
+
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+
+    // ---------- rooms ----------
+
+    match /rooms/{roomId} {
+      allow read: if isMember();
+
+      // Any signed-in teacher or school head can add a classroom.
+      // The document ID is the room number (1 to 4 digits).
+      allow create: if isMember()
+        && roomId.matches('[0-9]{1,4}')
+        && request.resource.data.room is string
+        && request.resource.data.building is string
+        && request.resource.data.building.size() > 0
+        && request.resource.data.building.size() <= 60
+        && request.resource.data.items is list
+        && request.resource.data.items.size() > 0
+        && request.resource.data.items.size() <= 50
+        && photoOk(request.resource.data);
+
+      allow update: if isMember()
+        && request.resource.data.items is list
+        && request.resource.data.items.size() > 0
+        && request.resource.data.items.size() <= 50
+        && photoOk(request.resource.data);
+
+      allow delete: if false;
+    }
+
+
+    // ---------- maintenance reports ----------
+
+    match /reports/{reportId} {
+      allow read: if isMember();
+
+      // Teachers file new reports. A new report is always unverified.
+      allow create: if isTeacher()
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.verification == 'Pending Verification'
+        && request.resource.data.status == ''
+        && request.resource.data.item is string
+        && request.resource.data.item.size() > 0
+        && request.resource.data.item.size() <= 100
+        && request.resource.data.concern is string
+        && request.resource.data.concern.size() > 0
+        && request.resource.data.concern.size() <= 100
+        && request.resource.data.get('action', '') in ['For repair', 'For disposal']
+        && request.resource.data.get('itemDetail', '').size() <= 100
+        && request.resource.data.get('defectKind', '').size() <= 100
+        && request.resource.data.description is string
+        && request.resource.data.description.size() > 0
+        && request.resource.data.description.size() <= 2000
+        && request.resource.data.quantity is number
+        && request.resource.data.quantity >= 1
+        && request.resource.data.quantity <= 10000
+        && photoOk(request.resource.data);
+
+      // The school head verifies reports and updates maintenance status.
+      // Nothing about the report itself (item, quantity, description…) can change.
+      allow update: if isHead()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+             'verification', 'verifiedDate', 'verifiedBy',
+             'status', 'statusHistory', 'actualCompletion', 'damageResolved'
+           ])
+        && request.resource.data.verification in ['Pending Verification', 'Verified']
+        && request.resource.data.status in ['', 'Scheduled', 'In Progress', 'Completed'];
+
+      allow delete: if false;
+    }
+
+  }
+}

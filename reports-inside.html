@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>BuildSafe DIHS - Report Details</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="theme.css">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <h1>BuildSafe DIHS</h1>
+
+        <p>
+            Digital Classroom Inventory System
+        </p>
+
+        <button onclick="goToDashboard()">
+            Dashboard
+        </button>
+
+        <button onclick="goToClassroom()">
+            Classroom
+        </button>
+
+        <button onclick="goToReports()">
+            Reports
+        </button>
+
+        <button onclick="logout()">
+            Logout
+        </button>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <button
+            class="back-button"
+            onclick="goToReports()">
+
+            ← Back to Reports
+
+        </button>
+
+
+        <section class="report-detail-page">
+
+            <div class="report-detail-header">
+
+                <div>
+
+                    <p class="report-label">
+                        MAINTENANCE REPORT
+                    </p>
+
+                    <h1>
+                        Teacher Report
+                    </h1>
+
+                    <p id="detailRoom">
+                        Room 18 • Building 17
+                    </p>
+
+                </div>
+
+                <span
+                    id="reportVerificationBadge"
+                    class="report-badge">
+
+                    Pending Verification
+
+                </span>
+
+            </div>
+
+
+            <!-- REPORT INFORMATION -->
+
+            <div class="report-detail-card">
+
+                <h2>
+                    Report Information
+                </h2>
+
+
+                <div class="report-info-grid">
+
+                    <div>
+
+                        <span>
+                            Item
+                        </span>
+
+                        <strong id="detailItem">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Quantity
+                        </span>
+
+                        <strong id="detailQuantity">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Concern
+                        </span>
+
+                        <strong id="detailConcern">
+                            —
+                        </strong>
+
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Specific Defect
+                        </span>
+
+                        <strong id="detailDefect">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Recommended Action
+                        </span>
+
+                        <strong id="detailAction">
+                            —
+                        </strong>
+
+                    </div>
+
+
+
+                    <div>
+
+                        <span>
+                            Date Reported
+                        </span>
+
+                        <strong id="detailReported">
+                            —
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="report-description">
+
+                    <span>
+                        Description
+                    </span>
+
+                    <p id="detailDescription">
+                        —
+                    </p>
+
+                </div>
+
+                <div class="report-photo" id="detailPhotoWrap" style="display:none;">
+                    <span>Photo</span>
+                    <img id="detailPhoto" alt="Photo of the reported defect">
+                </div>
+
+            </div>
+
+
+            <!-- VERIFICATION -->
+
+            <div class="report-detail-card">
+
+                <h2>
+                    Verification
+                </h2>
+
+
+                <div class="status-row">
+
+                    <span>
+                        Verification Status
+                    </span>
+
+                    <strong id="detailVerification">
+                        Pending Verification
+                    </strong>
+
+                </div>
+
+
+                <div class="status-row">
+
+                    <span>
+                        Verified Date
+                    </span>
+
+                    <strong id="detailVerifiedDate">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <button
+                    id="verifyReportButton"
+                    class="verify-button"
+                    onclick="verifyCurrentReport()">
+
+                    ✓ Verify Report
+
+                </button>
+
+            </div>
+
+
+            <!-- MAINTENANCE -->
+
+            <div class="report-detail-card">
+
+                <h2>
+                    Maintenance
+                </h2>
+
+
+                <div class="status-row">
+
+                    <span>
+                        Maintenance Status
+                    </span>
+
+                    <strong id="detailStatus">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div class="status-row">
+
+                    <span>
+                        Last Updated
+                    </span>
+
+                    <strong id="detailLastUpdated">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div
+                    id="maintenanceControls"
+                    class="maintenance-controls">
+
+                    <label for="repairStatus">
+
+                        Update Maintenance Status
+
+                    </label>
+
+
+                    <select
+                        id="repairStatus"
+                        onchange="updateCurrentReportStatus(this.value)">
+
+                        <option value="">
+                            Select status
+                        </option>
+
+                        <option value="Scheduled">
+                            Scheduled
+                        </option>
+
+                        <option value="In Progress">
+                            In Progress
+                        </option>
+
+                        <option value="Completed">
+                            Completed
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div
+                    id="maintenanceLocked"
+                    class="maintenance-locked">
+
+                    <strong>
+                        Maintenance controls are locked.
+                    </strong>
+
+                    <p>
+                        The report must be verified first.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- HISTORY -->
+
+            <div class="report-detail-card">
+
+                <h2>
+                    Report History
+                </h2>
+
+
+                <div id="reportTimeline">
+
+                    <p>
+                        No history available.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="firebase-config.js"></script>
+<script src="store.js"></script>
+<script src="app.js"></script>
+
+</body>
+
+</html>

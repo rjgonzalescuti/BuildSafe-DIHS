@@ -1,0 +1,72 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuildSafe DIHS - Maintenance Reports</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+
+        <h1>BuildSafe DIHS</h1>
+
+        <p>Digital Classroom Inventory System</p>
+
+        <button onclick="goToDashboard()">Dashboard</button>
+        <button onclick="goToClassroom()">Classroom</button>
+        <button onclick="goToReports()">Reports</button>
+        <button onclick="logout()">Logout</button>
+
+    </aside>
+
+    <main class="main-content">
+
+        <h1>Maintenance Reports</h1>
+
+        <p>Receive and review classroom maintenance reports.</p>
+
+        <div class="Report-box">
+
+            <div class="report-header">
+                <h2>Reports</h2>
+
+                <span id="newReportBadge" class="new-report-badge">
+                    0 New Updates
+                </span>
+            </div>
+
+            <div id="reportRoomList"></div>
+
+        </div>
+
+        <!-- Reports for the selected room appear here -->
+
+        <section class="Report-box" id="roomReportList" style="display:none;">
+
+            <div class="report-header">
+                <h2 id="selectedRoomTitle">Room Reports</h2>
+            </div>
+
+            <div id="roomReportItems"></div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="firebase-config.js"></script>
+<script src="store.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>

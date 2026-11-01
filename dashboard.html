@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BuildSafe DIHS Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+
+<body>
+
+    <div class="dashboard">
+
+        <aside class="sidebar">
+
+            <h2>BuildSafe DIHS</h2>
+
+            <p>
+                Digital Classroom Inventory System
+            </p>
+
+            <button onclick="goToDashboard()">
+                Dashboard
+            </button>
+
+            <button onclick="goToClassroom()">
+                Classroom
+            </button>
+
+            <button onclick="logout()">
+                Logout
+            </button>
+
+        </aside>
+
+
+        <main class="main-content">
+
+            <div class="search-box">
+
+                <h1>
+                    Welcome to BuildSafe DIHS, Teacher / Room Adviser!
+                </h1>
+
+                <p>
+                    Find Your Classroom
+                </p>
+
+                <div class="search-bar">
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search building or rooms..."
+                    >
+
+                    <button onclick="searchDashboard()">
+                        Search
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-grid" id="statCards"></div>
+
+            <div class="Classroom">
+
+                <div class="action-bar">
+                <button type="button" class="action-button" onclick="openAddRoom()">+ Add Classroom</button>
+                <button type="button" class="action-button" onclick="openAddReport()">+ Report a Problem</button>
+            </div>
+
+            <div class="classroom-box" id="roomCards">
+                <p class="empty-note">Loading classrooms...</p>
+            </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- ADD CLASSROOM POP-UP -->
+
+    <div class="modal-backdrop" id="addRoomModal" hidden>
+
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="addRoomTitle">
+
+            <h2 id="addRoomTitle">Add Classroom</h2>
+
+            <form id="addRoomForm" onsubmit="submitAddRoom(event)">
+
+                <label for="newRoomNumber">
+                    Room number
+                    <input type="text" id="newRoomNumber" inputmode="numeric"
+                           maxlength="4" placeholder="e.g. 21" required>
+                </label>
+
+                <label for="newRoomBuilding">
+                    Building
+                    <input type="text" id="newRoomBuilding" maxlength="60"
+                           placeholder="e.g. Building 17" required>
+                </label>
+
+                <label for="newRoomAdviser">
+                    Teacher / Room Adviser (optional)
+                    <input type="text" id="newRoomAdviser" maxlength="80"
+                           placeholder="e.g. Mrs. Santos">
+                </label>
+
+                <p class="modal-note">
+                    The room starts with a standard item list (armchairs, tables,
+                    doors, windows, lights, outlets, fans) at quantity 0.
+                    Open the room to set the real quantities.
+                </p>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-cancel" onclick="closeAddRoom()">Cancel</button>
+                    <button type="submit">Add Classroom</button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- ADD REPORT POP-UP -->
+
+    <div class="modal-backdrop" id="addReportModal" hidden>
+
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="addReportTitle">
+
+            <h2 id="addReportTitle">Report a Problem</h2>
+
+            <form id="addReportForm" onsubmit="submitAddReport(event)">
+
+                <label for="newReportRoom">
+                    Classroom
+                    <select id="newReportRoom" onchange="fillReportItems()" required></select>
+                </label>
+
+                <label for="newReportItem">
+                    Item / Facility
+                    <select id="newReportItem" required></select>
+                </label>
+
+                <div id="newReportExtra"></div>
+
+                <label for="newReportQuantity">
+                    Quantity affected
+                    <input type="number" id="newReportQuantity" min="1" step="1"
+                           placeholder="How many are affected" required>
+                </label>
+
+                <label for="newReportType">
+                    Type of concern
+                    <select id="newReportType" required>
+                        <option value="">Select concern</option>
+                        <option>Damaged</option>
+                        <option>Broken</option>
+                        <option>Missing</option>
+                        <option>Safety Concern</option>
+                        <option>Other</option>
+                    </select>
+                </label>
+
+                <label for="newReportDescription">
+                    Description
+                    <textarea id="newReportDescription" maxlength="2000"
+                              placeholder="Describe the problem..." required></textarea>
+                </label>
+
+                <label for="newReportPhoto">
+                    Attach photo (optional)
+                    <input type="file" id="newReportPhoto" accept="image/*">
+                </label>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-cancel" onclick="closeAddReport()">Cancel</button>
+                    <button type="submit">Submit Report</button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <script src="firebase-config.js"></script>
+<script src="store.js"></script>
+<script src="app.js"></script>
+
+</body>
+
+</html>

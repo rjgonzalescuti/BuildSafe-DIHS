@@ -1,0 +1,467 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
+/* =========================================================
+   BUILDSAFE DIHS THEME
+   Loaded after style.css on every page. Dark-green sidebar,
+   light rounded content panel, soft cards, one font family.
+========================================================= */
+
+:root {
+    --font: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    --ink: #0e1a13;
+    --muted: #6b7a70;
+    --shell: #0f1a14;
+    --shell-2: #1a2a20;
+    --panel: #f2f6f2;
+    --card: #ffffff;
+    --line: #e3ebe4;
+    --green: #2fa84f;
+    --green-dark: #1f7a3a;
+    --green-soft: #dcebdc;
+    --amber: #d98a00;
+    --red: #d64545;
+}
+
+/* One font family everywhere (older rules used Georgia / Arial) */
+body, body * { font-family: var(--font) !important; }
+
+body {
+    color: var(--ink);
+    background:
+        linear-gradient(rgba(8, 28, 16, 0.55), rgba(8, 28, 16, 0.55)),
+        url("school-bg.jpg") center / cover fixed no-repeat,
+        linear-gradient(160deg, #0d1f14 0%, #1d8a3c 55%, #23a56a 100%) fixed;
+}
+
+h1, h2, h3, h4 { letter-spacing: -0.02em; }
+
+/* ---------- shell ---------- */
+
+.dashboard,
+.app-layout {
+    max-width: 1320px;
+    min-height: calc(100vh - 48px);
+    margin: 24px auto;
+    background: var(--shell);
+    border-radius: 28px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.sidebar,
+.inventory-sidebar {
+    width: 230px;
+    min-width: 230px;
+    padding: 26px 18px;
+    background: transparent;
+    position: sticky;
+    top: 24px;
+    height: calc(100vh - 48px);
+    min-height: 0;
+    align-self: flex-start;
+    gap: 6px;
+    overflow-y: auto;
+}
+
+.sidebar h2,
+.inventory-sidebar h2,
+.sidebar h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 6px;
+    color: #fff;
+    font-family: var(--font);
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.sidebar h2::before,
+.inventory-sidebar h2::before,
+.sidebar h1::before {
+    content: "";
+    width: 22px;
+    height: 22px;
+    flex: none;
+    background:
+        linear-gradient(var(--green), var(--green)) 0 100% / 5px 60% no-repeat,
+        linear-gradient(var(--green), var(--green)) 8px 100% / 5px 100% no-repeat,
+        linear-gradient(var(--green), var(--green)) 16px 100% / 5px 78% no-repeat;
+}
+
+.sidebar p,
+.inventory-sidebar p {
+    margin: 0 0 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color: #8fa497;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.sidebar button,
+.inventory-sidebar button {
+    width: 100%;
+    margin: 0;
+    padding: 13px 16px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    color: #c9d6cd;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.sidebar button:hover,
+.inventory-sidebar button:hover,
+.sidebar button.is-active,
+.inventory-sidebar button.is-active {
+    background: var(--shell-2);
+    color: #fff;
+}
+
+.sidebar button:last-of-type,
+.inventory-sidebar button:last-of-type {
+    margin-top: auto;
+}
+
+/* ---------- main panel ---------- */
+
+.main-content,
+.inventory-page {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    margin: 12px 12px 12px 0;
+    padding: 32px;
+    background: var(--panel);
+    border-radius: 22px;
+}
+
+.main-content h1,
+.inventory-header h1 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--ink);
+}
+
+.main-content p { color: var(--muted); }
+
+/* ---------- search / welcome card ---------- */
+
+.search-box {
+    max-width: none;
+    padding: 26px 28px;
+    margin-bottom: 22px;
+    background: var(--card);
+    border-radius: 18px;
+    box-shadow: 0 1px 3px rgba(15, 40, 25, 0.06);
+}
+
+.search-box h1 { font-size: 24px; }
+.search-box p { margin: 0; }
+
+.search-bar { margin-top: 16px; gap: 10px; }
+
+.search-bar input {
+    padding: 13px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+    font-size: 14px;
+}
+
+.search-bar input:focus,
+.modal input:focus,
+.modal select:focus,
+.modal textarea:focus {
+    outline: 2px solid var(--green);
+    outline-offset: 1px;
+}
+
+.search-bar button,
+.action-button,
+.modal-actions button,
+.account-option button,
+.inventory-actions button,
+.defect-buttons button,
+.verify-button,
+.inventory-header button,
+.change-photo {
+    border: none;
+    border-radius: 12px;
+    background: var(--shell);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+}
+
+.search-bar button { padding: 13px 22px; }
+
+.search-bar button:hover,
+.action-button:hover,
+.modal-actions button:hover,
+.account-option button:hover,
+.inventory-actions button:hover,
+.defect-buttons button:hover,
+.verify-button:hover,
+.inventory-header button:hover {
+    background: var(--green-dark);
+}
+
+.action-bar { margin-bottom: 18px; }
+.action-button { padding: 12px 20px; }
+
+.modal-actions .modal-cancel { background: var(--green-soft); color: var(--ink); }
+.modal-actions .modal-cancel:hover { background: #c9dfc9; }
+
+/* ---------- stat cards ---------- */
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.stat-card {
+    position: relative;
+    padding: 20px 22px;
+    min-height: 118px;
+    background: var(--card);
+    border-radius: 18px;
+    box-shadow: 0 1px 3px rgba(15, 40, 25, 0.06);
+}
+
+.stat-card .stat-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+.stat-card .stat-value { margin-top: 8px; font-size: 32px; font-weight: 800; letter-spacing: -0.03em; }
+.stat-card .stat-note { margin-top: 4px; font-size: 12px; color: var(--green-dark); font-weight: 600; }
+
+.stat-card.stat-dark { background: var(--shell); color: #fff; }
+.stat-card.stat-dark .stat-label { color: #9fb3a6; }
+.stat-card.stat-dark .stat-note { color: #62d884; }
+
+.stat-bars {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    height: 44px;
+}
+
+.stat-bars span {
+    width: 7px;
+    border-radius: 4px;
+    background: #d4ddd5;
+}
+
+.stat-bars span:nth-child(odd) { background: var(--green); }
+.stat-dark .stat-bars span { background: #2b4a37; }
+.stat-dark .stat-bars span:nth-child(odd) { background: var(--green); }
+
+/* ---------- classroom cards ---------- */
+
+.Classroom > h2 { margin: 0 0 14px; font-size: 18px; font-weight: 800; }
+
+.classroom-box { gap: 16px; }
+
+.room-card {
+    width: 260px;
+    min-height: 0;
+    padding: 20px 22px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--card);
+    box-shadow: 0 1px 3px rgba(15, 40, 25, 0.06);
+}
+
+.room-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--green);
+    box-shadow: 0 10px 24px rgba(15, 80, 40, 0.14);
+}
+
+.room-card h3 { margin: 0 0 4px; font-size: 19px; font-weight: 800; }
+.room-card p { margin: 0 0 16px; color: var(--muted); font-size: 13px; }
+.room-card strong { font-size: 13px; color: var(--ink); }
+.room-card span { margin-top: 10px; font-size: 12px; color: var(--muted); }
+
+
+.empty-note { color: var(--muted); }
+
+/* ---------- report list / report pages ---------- */
+
+.Report-box,
+.report-detail-card,
+.maintenance-list,
+.inventory-section,
+.room-info-box,
+.teacher-report-card,
+#reportSection {
+    border: none;
+    border-radius: 18px;
+    background: var(--card);
+    box-shadow: 0 1px 3px rgba(15, 40, 25, 0.06);
+}
+
+.Room-Report {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--card);
+}
+
+.Room-Report:hover { border-color: var(--green); }
+.Room-Report h2 { font-size: 17px; font-weight: 800; }
+
+.new-update,
+.new-report-badge {
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--green-soft);
+    color: var(--green-dark);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.new-update { background: var(--green); color: #fff; }
+
+.report-header h2,
+.inventory-section h2,
+.report-detail-card h2 { font-weight: 800; }
+
+/* ---------- tables ---------- */
+
+.inventory-table,
+.maintenance-history-table { border-collapse: collapse; width: 100%; }
+
+.inventory-table th,
+.maintenance-history-table th {
+    background: var(--panel);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border: none;
+    border-bottom: 1px solid var(--line);
+}
+
+.inventory-table td,
+.maintenance-history-table td {
+    border: none;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+}
+
+.inventory-table input,
+.report-detail-card select,
+.maintenance-controls select,
+.defect-form input,
+.defect-form textarea,
+#reportForm input,
+#reportForm select,
+#reportForm textarea {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--panel);
+}
+
+/* ---------- status pills ---------- */
+
+.inventory-status,
+.report-status,
+.report-badge,
+.status {
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.back-button {
+    border: none;
+    border-radius: 12px;
+    background: var(--shell);
+    color: #fff;
+    font-weight: 600;
+}
+
+.room-photo { border-radius: 16px; }
+
+/* ---------- modal ---------- */
+
+.modal { border-radius: 20px; }
+.modal h2 { font-weight: 800; }
+
+/* ---------- login page ---------- */
+
+.welcome-screen {
+    background:
+        linear-gradient(rgba(8, 28, 16, 0.45), rgba(8, 28, 16, 0.45)),
+        url("school-bg.jpg") center / cover no-repeat,
+        linear-gradient(160deg, #0d1f14 0%, #1d8a3c 55%, #23a56a 100%);
+}
+
+.welcome-box {
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.welcome-box h1 { font-family: var(--font); font-weight: 800; }
+.subtitle { color: var(--muted); font-family: var(--font); }
+.account-option h2 { font-family: var(--font); font-weight: 700; letter-spacing: 0.04em; }
+
+.account-option input {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+}
+
+.account-option button { padding: 12px 18px; }
+
+/* ---------- small screens ---------- */
+
+@media (max-width: 900px) {
+
+    .dashboard, .app-layout {
+        flex-direction: column;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    .sidebar, .inventory-sidebar {
+        position: static;
+        width: 100%;
+        min-width: 0;
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .sidebar h2, .inventory-sidebar h2, .sidebar h1 { width: 100%; }
+    .sidebar p, .inventory-sidebar p { display: none; }
+    .sidebar button, .inventory-sidebar button { width: auto; }
+    .sidebar button:last-of-type, .inventory-sidebar button:last-of-type { margin-top: 0; }
+
+    .main-content, .inventory-page { margin: 0; border-radius: 22px 22px 0 0; padding: 20px; }
+    .stat-grid { grid-template-columns: 1fr; }
+    .room-card { width: 100%; }
+}
+
+/* old blue headings -> theme ink */
+.inventory-section h2,
+.maintenance-list h2,
+.report-detail-card h2,
+.report-header h2,
+.eyebrow,
+.report-label { color: var(--ink); }
+
+.eyebrow, .report-label { color: var(--green-dark); }
+
+label[hidden] { display: none !important; }

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuildSafe DIHS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+
+<body>
+
+    <div class="welcome-screen">
+
+        <div class="welcome-box">
+
+            <img src="dihs-logo.png" alt="DIHS Logo" class="school-logo">
+
+            <h1>Welcome to BuildSafe DIHS</h1>
+
+            <p class="subtitle">
+                Digital Classroom Inventory System
+            </p>
+
+            <form class="account-option" onsubmit="schoolHeadLogin(event)" novalidate>
+                <h2>SCHOOL HEAD</h2>
+
+                <input type="text" id="schoolHeadAccount"
+                       placeholder="Enter Account Number" autocomplete="username">
+
+                <input type="password" id="schoolHeadPassword"
+                       placeholder="Enter Password" autocomplete="current-password"
+                       data-cloud-only style="display:none;">
+
+                <button type="submit">
+                    ENTER AS SCHOOL HEAD
+                </button>
+
+                <p class="login-error" id="schoolHeadError" role="alert"></p>
+            </form>
+
+            <form class="account-option" onsubmit="teacherAdviserLogin(event)" novalidate>
+                <h2>TEACHER / ROOM ADVISER</h2>
+
+                <input type="text" id="teacherAccount"
+                       placeholder="Enter Account Number" autocomplete="username">
+
+                <input type="password" id="teacherPassword"
+                       placeholder="Enter Password" autocomplete="current-password"
+                       data-cloud-only style="display:none;">
+
+                <button type="submit">
+                    ENTER AS TEACHER / ROOM ADVISER
+                </button>
+
+                <p class="login-error" id="teacherError" role="alert"></p>
+            </form>
+
+            <p class="mode-notice" id="modeNotice"></p>
+
+        </div>
+
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script src="store.js"></script>
+    <script src="app.js"></script>
+
+</body>
+
+</html>

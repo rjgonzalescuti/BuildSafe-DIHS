@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>BuildSafe DIHS - School Head Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="theme.css">
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <h2>BuildSafe DIHS</h2>
+
+        <p>
+            Digital Classroom Inventory System
+        </p>
+
+
+        <button onclick="goToDashboard()">
+            Dashboard
+        </button>
+
+        <button onclick="goToClassroom()">
+            Classroom
+        </button>
+
+        <button onclick="goToReports()">
+            Reports
+        </button>
+
+        <button onclick="logout()">
+            Logout
+        </button>
+
+    </aside>
+
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+
+        <!-- WELCOME -->
+
+        <section class="search-box">
+
+            <h1>
+                Welcome to BuildSafe DIHS, School Head!
+            </h1>
+
+            <p>
+                Manage and monitor all classroom inventories
+                and maintenance reports.
+            </p>
+
+
+            <div class="search-bar">
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search building or room..."
+                >
+
+                <button onclick="searchDashboard()">
+                    Search
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <div class="stat-grid" id="statCards"></div>
+
+        <!-- CLASSROOMS -->
+
+        <section
+            class="Classroom"
+            id="roomsSection"
+        >
+
+            <h2>
+                Classrooms
+            </h2>
+
+
+            <div class="action-bar">
+                <button type="button" class="action-button" onclick="openAddRoom()">+ Add Classroom</button>
+            </div>
+
+            <div class="classroom-box" id="roomCards">
+                <p class="empty-note">Loading classrooms...</p>
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+
+    <!-- ADD CLASSROOM POP-UP -->
+
+    <div class="modal-backdrop" id="addRoomModal" hidden>
+
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="addRoomTitle">
+
+            <h2 id="addRoomTitle">Add Classroom</h2>
+
+            <form id="addRoomForm" onsubmit="submitAddRoom(event)">
+
+                <label for="newRoomNumber">
+                    Room number
+                    <input type="text" id="newRoomNumber" inputmode="numeric"
+                           maxlength="4" placeholder="e.g. 21" required>
+                </label>
+
+                <label for="newRoomBuilding">
+                    Building
+                    <input type="text" id="newRoomBuilding" maxlength="60"
+                           placeholder="e.g. Building 17" required>
+                </label>
+
+                <label for="newRoomAdviser">
+                    Teacher / Room Adviser (optional)
+                    <input type="text" id="newRoomAdviser" maxlength="80"
+                           placeholder="e.g. Mrs. Santos">
+                </label>
+
+                <p class="modal-note">
+                    The room starts with a standard item list (armchairs, tables,
+                    doors, windows, lights, outlets, fans) at quantity 0.
+                    Open the room to set the real quantities.
+                </p>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-cancel" onclick="closeAddRoom()">Cancel</button>
+                    <button type="submit">Add Classroom</button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+<!-- SCRIPTS: Firebase settings, data store, app -->
+
+<script src="firebase-config.js"></script>
+<script src="store.js"></script>
+<script src="app.js"></script>
+
+</body>
+
+</html>
