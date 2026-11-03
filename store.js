@@ -365,7 +365,8 @@
             actualCompletion: data.actualCompletion || "",
             damageResolved: Boolean(data.damageResolved),
             statusHistory: history,
-            createdBy: data.createdBy || ""
+            createdBy: data.createdBy || "",
+            createdByName: String(data.createdByName || "")
         };
 
     }
@@ -409,7 +410,7 @@
 
     const REPORT_ACTIONS = ["For repair", "For disposal"];
 
-    function buildNewReport(input, now, uid) {
+    function buildNewReport(input, now, uid, name) {
 
         const roomNumber = String(input.roomNumber || "").replace(/\D/g, "");
         const item = String(input.item || "").trim();
@@ -499,7 +500,8 @@
             actualCompletion: "",
             damageResolved: false,
             statusHistory: [{ status: "Report Submitted", date: now }],
-            createdBy: uid || ""
+            createdBy: uid || "",
+            createdByName: String(name || "").slice(0, 100)
         };
 
     }
@@ -1767,7 +1769,7 @@
 
                 requireRole(actor, [ROLES.TEACHER]);
 
-                return backend.addReport(buildNewReport(input, nowIso(), actor.uid));
+                return backend.addReport(buildNewReport(input, nowIso(), actor.uid, actor.name));
 
             },
 

@@ -1,0 +1,68 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuildSafe DIHS - Room Reports</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+
+        <h1>BuildSafe DIHS</h1>
+
+        <p>Digital Classroom Inventory System</p>
+
+        <button onclick="goToDashboard()">Dashboard</button>
+        <button onclick="goToClassroom()">Classroom</button>
+        <button onclick="goToReports()">Reports</button>
+        <button onclick="logout()">Logout</button>
+
+    </aside>
+
+    <main class="main-content">
+
+        <button class="back-button" onclick="goToReports()">← Back to Reports</button>
+
+        <h1 id="roomReportsTitle">Room Reports</h1>
+
+        <p id="roomReportsSub">All reports filed for this classroom.</p>
+
+        <div class="stat-grid stat-grid-4" id="roomStats"></div>
+
+        <section class="Report-box">
+
+            <div class="report-header">
+                <h2>All Reports</h2>
+                <span class="new-report-badge" id="roomReportCount">0 reports</span>
+            </div>
+
+            <p class="empty-note">Search by item, defect, or teacher. Older reports stay here as history.</p>
+
+            <input type="text" id="roomReportSearch" class="report-search"
+                   placeholder="Search reports..." oninput="renderRoomReportList()">
+
+            <div class="chip-row" id="roomReportFilters"></div>
+
+            <div id="roomReportsList"></div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="firebase-config.js"></script>
+<script src="store.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>

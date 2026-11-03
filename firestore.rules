@@ -99,6 +99,7 @@ service cloud.firestore {
         && request.resource.data.get('action', '') in ['For repair', 'For disposal']
         && request.resource.data.get('itemDetail', '').size() <= 100
         && request.resource.data.get('defectKind', '').size() <= 100
+        && request.resource.data.get('createdByName', '').size() <= 100
         && request.resource.data.description is string
         && request.resource.data.description.size() > 0
         && request.resource.data.description.size() <= 2000

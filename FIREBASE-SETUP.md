@@ -146,6 +146,7 @@ Cloud Storage plan is needed.
 | `verification`    | string  | `Pending Verification` (becomes `Verified`) |
 | `status`          | string  | empty (becomes Scheduled / In Progress / Completed) |
 | `createdBy`       | string  | the teacher's UID                          |
+| `createdByName`   | string  | the teacher's display name (shown on the room's report list) |
 | `statusHistory`   | array   | list of status and date entries            |
 
 To add a classroom by hand instead, go to Firestore Database → Data → `rooms` →
@@ -177,3 +178,24 @@ firebase deploy --only firestore:rules
 ```
 
 Nothing else changes in Firebase. Reports filed before this update simply show "—" for the new fields.
+
+### Report history per room (School Head)
+
+On the **Reports** page the classroom list stays. Click a room to open **all** reports
+filed for that room, newest first. Old reports are never replaced: when a teacher adds a
+new report, the earlier ones stay in the list as history.
+
+* The room page shows Total, Pending Review, In Progress and Completed counts, a search
+  box, and filter buttons (All, Pending, Verified, In Progress, Completed).
+* **View Details** opens that one report. **Back to Room Reports** returns to the list.
+* Stages: *Pending* = not yet verified, *Verified* = verified and waiting or scheduled,
+  *In Progress*, *Completed*.
+
+**Firebase step:** publish the rules once so the new `createdByName` field is checked:
+
+```
+firebase deploy --only firestore:rules
+```
+
+Reports filed before this update have no teacher name saved, so the list shows the room's
+adviser name instead.

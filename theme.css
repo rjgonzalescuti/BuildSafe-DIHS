@@ -465,3 +465,68 @@ h1, h2, h3, h4 { letter-spacing: -0.02em; }
 .eyebrow, .report-label { color: var(--green-dark); }
 
 label[hidden] { display: none !important; }
+
+/* ---------- room reports page ---------- */
+
+.stat-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.stat-value.tone-amber { color: #b7791f; }
+.stat-value.tone-blue { color: #2b6cb0; }
+.stat-value.tone-green { color: var(--green-dark); }
+
+.report-search {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 10px 0 12px;
+    padding: 13px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+    font-size: 14px;
+}
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+
+.chip {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 999px;
+    background: var(--panel);
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.chip.is-active { background: var(--shell); color: #fff; }
+
+.report-row { padding: 16px 0; border-top: 1px solid var(--line); }
+.report-row-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.report-row-top h3 { margin: 0; font-size: 17px; font-weight: 800; }
+.report-row-meta { margin: 4px 0 10px; color: var(--muted); font-size: 14px; }
+.report-row-bottom { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 14px; }
+
+.view-details {
+    border: none;
+    background: transparent;
+    color: var(--green-dark);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.view-details:hover { text-decoration: underline; }
+
+.stage-pill {
+    flex: none;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.stage-pending { background: #fde6d8; color: #d1581f; }
+.stage-verified { background: #ece3f7; color: #7a4fc0; }
+.stage-in-progress { background: #dbeafe; color: #2b6cb0; }
+.stage-completed { background: #d7f0df; color: var(--green-dark); }
+
+@media (max-width: 900px) { .stat-grid-4 { grid-template-columns: repeat(2, 1fr); } }

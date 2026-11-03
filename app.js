@@ -39,6 +39,7 @@
         "dashboard-head.html": [ROLES.HEAD],
         "inventory.html": [ROLES.TEACHER, ROLES.HEAD],
         "reports.html": [ROLES.HEAD],
+        "room-reports.html": [ROLES.HEAD],
         "reports-inside.html": [ROLES.HEAD]
     };
 
@@ -481,28 +482,20 @@
 
     }
 
-    // Opens a room's most urgent report: unverified ones first, newest first.
+    // Opens the list of every report filed for a room (old ones stay as history).
     function openReport(roomNumber) {
 
-        if (!requireData()) return;
+        window.location.href =
+            "room-reports.html?room=" + encodeURIComponent(roomNumber);
 
-        const reports = reportsForRoom(roomNumber).sort(function (a, b) {
+    }
 
-            if (isPending(a) !== isPending(b)) return isPending(a) ? -1 : 1;
+    function goBackToRoomReports() {
 
-            return newestFirst(a, b);
+        const report = currentReport();
 
-        });
-
-        if (reports.length === 0) {
-
-            notify("There are no reports for Room " + roomNumber + " yet.", "info");
-
-            return;
-
-        }
-
-        openReportById(reports[0].id);
+        if (report) openReport(report.roomNumber);
+        else goToReports();
 
     }
 
@@ -880,6 +873,158 @@
 
     }
 
+    /* =====================================================
+       ROOM REPORTS  (list of all reports in one classroom)
+    ===================================================== */
+
+    let roomReportFilter = "All";
+
+    const STAGES = ["Pending", "Verified", "In Progress", "Completed"];
+
+    function reportStage(report) {
+
+        if (isPending(report)) return "Pending";
+        if (report.status === "Completed") return "Completed";
+        if (report.status === "In Progress") return "In Progress";
+
+        return "Verified";
+
+    }
+
+    function reporterName(report) {
+
+        const room = state.rooms[report.roomNumber];
+
+        return report.createdByName || (room && room.adviser) || "Teacher";
+
+    }
+
+    function reportTitle(report) {
+
+        const problem = report.defectKind || report.concern;
+
+        return itemLabel(report) + (problem ? " – " + problem : "");
+
+    }
+
+    function setRoomReportFilter(name) {
+
+        roomReportFilter = name;
+        renderRoomReports();
+
+    }
+
+    function renderRoomReports() {
+
+        const list = byId("roomReportsList");
+
+        if (!list) return;
+
+        const roomNumber = getCurrentRoomNumber();
+        const room = state.rooms[roomNumber];
+        const reports = reportsForRoom(roomNumber).sort(newestFirst);
+
+        setText("roomReportsTitle", room ? room.room + " Reports" : "Room " + roomNumber + " Reports");
+        setText("roomReportsSub", room
+            ? room.building + " • every report filed for this classroom, newest first."
+            : "Reports for this classroom.");
+
+        const count = function (stage) {
+            return reports.filter(function (report) { return reportStage(report) === stage; }).length;
+        };
+
+        const stats = [
+            { label: "Total Reports", value: reports.length, tone: "" },
+            { label: "Pending Review", value: count("Pending"), tone: "tone-amber" },
+            { label: "In Progress", value: count("In Progress"), tone: "tone-blue" },
+            { label: "Completed", value: count("Completed"), tone: "tone-green" }
+        ];
+
+        byId("roomStats").innerHTML = stats.map(function (stat) {
+
+            return '<div class="stat-card"><div class="stat-label">' + escapeHtml(stat.label) +
+                '</div><div class="stat-value ' + stat.tone + '">' + stat.value + "</div></div>";
+
+        }).join("");
+
+        byId("roomReportFilters").innerHTML = ["All"].concat(STAGES).map(function (name) {
+
+            return '<button type="button" class="chip' + (name === roomReportFilter ? " is-active" : "") +
+                '" data-filter="' + escapeHtml(name) + '">' + escapeHtml(name) + "</button>";
+
+        }).join("");
+
+        byId("roomReportFilters").querySelectorAll("[data-filter]").forEach(function (chip) {
+
+            chip.addEventListener("click", function () {
+                setRoomReportFilter(chip.dataset.filter);
+            });
+
+        });
+
+        renderRoomReportList();
+
+    }
+
+    function renderRoomReportList() {
+
+        const list = byId("roomReportsList");
+
+        if (!list) return;
+
+        const term = (byId("roomReportSearch").value || "").toLowerCase().trim();
+
+        const all = reportsForRoom(getCurrentRoomNumber()).sort(newestFirst);
+
+        const shown = all.filter(function (report) {
+
+            if (roomReportFilter !== "All" && reportStage(report) !== roomReportFilter) return false;
+
+            if (!term) return true;
+
+            return [report.item, report.itemDetail, report.defectKind, report.concern,
+                report.description, reporterName(report)]
+                .join(" ").toLowerCase().indexOf(term) !== -1;
+
+        });
+
+        setText("roomReportCount", all.length + (all.length === 1 ? " report" : " reports"));
+
+        if (shown.length === 0) {
+
+            list.innerHTML = '<p class="empty-note">' + (all.length === 0
+                ? "No reports for this classroom yet."
+                : "No reports match your search or filter.") + "</p>";
+
+            return;
+
+        }
+
+        list.innerHTML = shown.map(function (report) {
+
+            const stage = reportStage(report);
+
+            return '<div class="report-row">' +
+                '<div class="report-row-top"><h3>' + escapeHtml(reportTitle(report)) + "</h3>" +
+                '<span class="stage-pill stage-' + statusClass(stage) + '">' + escapeHtml(stage) + "</span></div>" +
+                '<p class="report-row-meta">' + escapeHtml(report.room) + " · " +
+                escapeHtml(reporterName(report)) + "</p>" +
+                '<div class="report-row-bottom"><span>' + escapeHtml(formatDate(report.dateReported)) + "</span>" +
+                '<button type="button" class="view-details" data-report-id="' +
+                escapeHtml(report.id) + '">View Details →</button></div></div>';
+
+        }).join("");
+
+        list.querySelectorAll("[data-report-id]").forEach(function (button) {
+
+            button.addEventListener("click", function () {
+                openReportById(button.dataset.reportId);
+            });
+
+        });
+
+    }
+
     // "NEW UPDATE" badges on the reports page.
     function renderRoomBadges() {
 
@@ -1128,7 +1273,8 @@
             return '<button type="button" class="Room-Report" data-room="' +
                 escapeHtml(roomNumber) + '">' +
                 "<div><h2>" + escapeHtml(room.room) + "</h2>" +
-                "<p>" + escapeHtml(room.building) + "</p></div>" +
+                "<p>" + escapeHtml(room.building) + " · " + reportsForRoom(roomNumber).length +
+                (reportsForRoom(roomNumber).length === 1 ? " report" : " reports") + "</p></div>" +
                 '<span id="newUpdate' + escapeHtml(roomNumber) +
                 '" class="new-update" style="display:none;">NEW UPDATE</span>' +
                 "</button>";
@@ -1573,7 +1719,7 @@
     // Highlight the current page in the sidebar.
     function markActiveNav() {
 
-        const wanted = /^reports/.test(PAGE) ? "goToReports()"
+        const wanted = /^(room-)?reports/.test(PAGE) ? "goToReports()"
             : /^dashboard/.test(PAGE) ? "goToDashboard()"
             : null;
 
@@ -1602,6 +1748,7 @@
         renderTeacherHistory();
         renderHeadReports();
         renderRoomBadges();
+        renderRoomReports();
         renderHeadSummary();
         renderReportDetails();
 
@@ -1841,6 +1988,8 @@
         goToReports: goToReports,
         openInventory: openInventory,
         openReport: openReport,
+        goBackToRoomReports: goBackToRoomReports,
+        renderRoomReportList: renderRoomReportList,
         openReportById: openReportById,
         searchDashboard: searchDashboard,
         searchHeadDashboard: searchDashboard,
