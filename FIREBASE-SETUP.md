@@ -72,7 +72,8 @@ Cloud Storage plan is needed.
 
 | Action                                  | Teacher | School Head |
 |-----------------------------------------|:-------:|:-----------:|
-| Read rooms and reports                  |   yes   |     yes     |
+| Read rooms                              |   yes   |     yes     |
+| Read reports                            | own only|     all     |
 | Add a classroom                         |   yes   |     yes     |
 | Edit inventory and room photo           |   yes   |     yes     |
 | Submit a defect report                  |   yes   |     no      |
@@ -199,3 +200,29 @@ firebase deploy --only firestore:rules
 
 Reports filed before this update have no teacher name saved, so the list shows the room's
 adviser name instead.
+
+### Teachers only see their own reports
+
+A teacher sees only the reports they filed themselves. The School Head sees every report.
+This is enforced in `firestore.rules` (a teacher can read a report only when its
+`createdBy` equals their own UID), not just hidden on the page.
+
+**Firebase step:** publish the rules again:
+
+```
+firebase deploy --only firestore:rules
+```
+
+Good to know:
+
+* Reports filed before the `createdBy` field existed, or by another teacher, no longer
+  appear on a teacher's screens. They are still in the database and the School Head sees them.
+* On a room's inventory page, an item's status badge is based on that teacher's own
+  reports, so an item reported by someone else shows "No Report" to them.
+
+### Who is logged in
+
+Every page shows a small profile badge at the top right with the person's initials, name
+and role. The name comes from the `displayName` field of their document in the `users`
+collection, so set a real name there (for example `Mrs. Santos`). Without one, the app
+falls back to the account's email.

@@ -1025,6 +1025,17 @@
 
     }
 
+    // Teachers only see the reports they filed, so say so.
+    function renderHistoryTitle() {
+
+        if (!byId("historyTitle")) return;
+
+        const isTeacher = state.session && state.session.role === ROLES.TEACHER;
+
+        setText("historyTitle", isTeacher ? "My Reports in this Room" : "Maintenance History");
+
+    }
+
     // "NEW UPDATE" badges on the reports page.
     function renderRoomBadges() {
 
@@ -1696,9 +1707,9 @@
             isHead
                 ? { label: "Awaiting Verification", value: pending,
                     note: pending ? "Needs your review" : "All caught up", bars: [30, 70, 45, 85, 55] }
-                : { label: "Open Reports", value: open,
+                : { label: "My Open Reports", value: open,
                     note: open ? "Not yet completed" : "No open problems", bars: [30, 70, 45, 85, 55] },
-            { label: "Completed Repairs", value: completed,
+            { label: isHead ? "Completed Repairs" : "My Completed Repairs", value: completed,
               note: "Marked Completed", bars: [40, 55, 75, 60, 90] }
         ];
 
@@ -1749,6 +1760,7 @@
         renderHeadReports();
         renderRoomBadges();
         renderRoomReports();
+        renderHistoryTitle();
         renderHeadSummary();
         renderReportDetails();
 
@@ -1882,10 +1894,44 @@
 
     }
 
+    /* =====================================================
+       PROFILE CHIP  (who is logged in, top right of every page)
+    ===================================================== */
+
+    function renderProfile() {
+
+        const session = state.session;
+        const host = document.querySelector(".main-content, .inventory-page");
+
+        if (!session || !host || byId("profileChip")) return;
+
+        const name = session.name || ROLE_LABELS[session.role] || "User";
+        const roleLabel = ROLE_LABELS[session.role] || "";
+        const initials = name.split(/\s+/).filter(function (part) {
+            return /^[A-Za-z]/.test(part);
+        }).slice(0, 2).map(function (part) {
+            return part.charAt(0).toUpperCase();
+        }).join("") || "U";
+
+        const chip = document.createElement("div");
+
+        chip.id = "profileChip";
+        chip.className = "profile-chip";
+        chip.title = session.email || name;
+        chip.innerHTML = '<span class="profile-avatar">' + escapeHtml(initials) + "</span>" +
+            '<span class="profile-text"><strong>' + escapeHtml(name) + "</strong>" +
+            (roleLabel && roleLabel !== name ? "<small>" + escapeHtml(roleLabel) + "</small>" : "") +
+            "</span>";
+
+        host.insertBefore(chip, host.firstChild);
+
+    }
+
     function startPage() {
 
         applyRoleVisibility();
         markActiveNav();
+        renderProfile();
         setupReportExtras("report");
 
         store.subscribe({
@@ -1910,7 +1956,7 @@
 
             onError: handleSyncError
 
-        });
+        }, state.session);
 
     }
 

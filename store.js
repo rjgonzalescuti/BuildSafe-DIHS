@@ -729,6 +729,7 @@
         const ROLE_KEY = "buildSafeRole";
 
         const listeners = new Set();
+        const actors = new Map();
 
 
         function readJson(key) {
@@ -795,10 +796,13 @@
 
         }
 
-        function getReports() {
+        // A teacher only gets the reports they filed; the school head gets all.
+        function getReports(actor) {
 
             return readReportList().map(function (raw) {
                 return normalizeReport(raw);
+            }).filter(function (report) {
+                return !actor || actor.role !== ROLES.TEACHER || report.createdBy === actor.uid;
             });
 
         }
@@ -822,12 +826,11 @@
             if (listeners.size === 0) return;
 
             const rooms = getRooms();
-            const reports = getReports();
 
             listeners.forEach(function (handlers) {
 
                 if (handlers.onRooms) handlers.onRooms(rooms);
-                if (handlers.onReports) handlers.onReports(reports);
+                if (handlers.onReports) handlers.onReports(getReports(actors.get(handlers)));
 
             });
 
@@ -899,9 +902,10 @@
 
             },
 
-            subscribe: function (handlers) {
+            subscribe: function (handlers, actor) {
 
                 listeners.add(handlers);
+                actors.set(handlers, actor || null);
 
                 // Deliver the current data right away, but asynchronously,
                 // the same way the cloud backend does.
@@ -910,12 +914,13 @@
                     if (!listeners.has(handlers)) return;
 
                     if (handlers.onRooms) handlers.onRooms(getRooms());
-                    if (handlers.onReports) handlers.onReports(getReports());
+                    if (handlers.onReports) handlers.onReports(getReports(actor));
 
                 });
 
                 return function () {
                     listeners.delete(handlers);
+                    actors.delete(handlers);
                 };
 
             },
@@ -1397,7 +1402,7 @@
 
             },
 
-            subscribe: function (handlers) {
+            subscribe: function (handlers, actor) {
 
                 let stopped = false;
                 let stopRooms = function () {};
@@ -1431,8 +1436,16 @@
                         }
                     );
 
+                    // Teachers only ask for their own reports (the rules enforce it too).
+                    const reportsSource = actor && actor.role === ROLES.TEACHER
+                        ? sdk.fs.query(
+                            sdk.fs.collection(db, "reports"),
+                            sdk.fs.where("createdBy", "==", actor.uid)
+                        )
+                        : sdk.fs.collection(db, "reports");
+
                     stopReports = sdk.fs.onSnapshot(
-                        sdk.fs.collection(db, "reports"),
+                        reportsSource,
                         function (snapshot) {
 
                             const reports = [];
@@ -1704,8 +1717,8 @@
 
             // handlers: { onRooms(rooms), onReports(reports), onError(error) }
             // Returns a function that stops listening.
-            subscribe: function (handlers) {
-                return backend.subscribe(handlers);
+            subscribe: function (handlers, actor) {
+                return backend.subscribe(handlers, actor);
             },
 
             saveRoomInventory: async function (roomNumber, items, actor) {

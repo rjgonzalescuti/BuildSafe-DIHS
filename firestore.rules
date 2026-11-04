@@ -83,7 +83,9 @@ service cloud.firestore {
     // ---------- maintenance reports ----------
 
     match /reports/{reportId} {
-      allow read: if isMember();
+      // The school head reads every report; a teacher only the ones they filed.
+      allow read: if isHead()
+        || (isTeacher() && resource.data.createdBy == request.auth.uid);
 
       // Teachers file new reports. A new report is always unverified.
       allow create: if isTeacher()
