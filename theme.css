@@ -535,10 +535,18 @@ label[hidden] { display: none !important; }
 
 .main-content, .inventory-page { position: relative; }
 
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin: 0 0 16px;
+}
+
 .profile-chip {
     display: flex;
     width: fit-content;
-    margin: 0 0 16px auto;
+    margin: 0;
     align-items: center;
     gap: 10px;
     padding: 6px 14px 6px 6px;
@@ -564,3 +572,154 @@ label[hidden] { display: none !important; }
 .profile-text small { font-size: 11px; color: var(--muted); }
 
 
+
+/* ---------- notifications ---------- */
+
+.notif-wrap { position: relative; }
+
+.notif-bell {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: 0 1px 4px rgba(15, 40, 25, 0.12);
+    cursor: pointer;
+}
+
+.notif-bell:hover { background: var(--green-soft); }
+
+.notif-count {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    min-width: 18px;
+    padding: 1px 5px;
+    border-radius: 999px;
+    background: var(--red);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.notif-count[hidden] { display: none; }
+
+.notif-panel {
+    position: absolute;
+    top: 52px;
+    right: 0;
+    z-index: 30;
+    width: 340px;
+    max-width: 88vw;
+    max-height: 420px;
+    overflow-y: auto;
+    padding: 14px;
+    border-radius: 16px;
+    background: var(--card);
+    box-shadow: 0 12px 32px rgba(15, 40, 25, 0.22);
+}
+
+.notif-panel[hidden] { display: none; }
+
+.notif-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+
+.notif-read {
+    border: none;
+    background: transparent;
+    color: var(--green-dark);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.notif-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    border-radius: 12px;
+    background: var(--panel);
+    font-size: 13px;
+}
+
+.notif-item.is-new { background: var(--green-soft); border-left: 4px solid var(--green); }
+.notif-item small { color: var(--muted); }
+
+/* ---------- my reports: details ---------- */
+
+.report-more { margin-top: 10px; }
+
+.report-more summary {
+    display: inline-block;
+    color: var(--green-dark);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.report-facts {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 6px 14px;
+    margin: 12px 0;
+    font-size: 14px;
+}
+
+.report-facts dt { color: var(--muted); }
+.report-facts dd { margin: 0; font-weight: 600; }
+.report-photo { max-width: 240px; border-radius: 12px; }
+.timeline-title { margin: 12px 0 6px; font-size: 14px; }
+.report-timeline { margin: 0; padding-left: 18px; font-size: 13px; color: var(--muted); }
+
+/* ---------- clickable stat cards ---------- */
+
+a.stat-link { display: block; color: inherit; text-decoration: none; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
+a.stat-link:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(15, 80, 40, 0.16); }
+a.stat-link:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+/* ---------- reports hub: activity log ---------- */
+
+.summary-card {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 6px 0 14px;
+    padding: 16px 20px;
+    border-radius: 16px;
+    background: var(--green-soft);
+    color: var(--green-dark);
+}
+
+.summary-card span { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; }
+.summary-card strong { font-size: 34px; font-weight: 800; letter-spacing: -0.03em; }
+.summary-card small { font-size: 13px; }
+.summary-card.tone-amber { background: #fdf0d5; color: #8a5a00; }
+.summary-card.tone-blue { background: #dbeafe; color: #1f4f8a; }
+
+.activity-card {
+    margin-bottom: 14px;
+    padding: 18px 20px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--card);
+}
+
+.activity-dates {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 12px 0 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+}
+
+.activity-dates small { display: block; color: var(--muted); font-size: 12px; }
+.activity-dates strong { font-size: 14px; }
+.activity-dates .is-right { text-align: right; }
+.activity-card .view-details { padding: 0; }

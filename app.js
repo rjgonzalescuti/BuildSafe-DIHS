@@ -40,6 +40,7 @@
         "inventory.html": [ROLES.TEACHER, ROLES.HEAD],
         "reports.html": [ROLES.HEAD],
         "room-reports.html": [ROLES.HEAD],
+        "my-reports.html": [ROLES.TEACHER],
         "reports-inside.html": [ROLES.HEAD]
     };
 
@@ -452,6 +453,12 @@
     // Each role's classroom list lives on its dashboard.
     function goToClassroom() {
         goToDashboard();
+    }
+
+    function goToMyReports() {
+
+        window.location.href = "my-reports.html";
+
     }
 
     function goToReports() {
@@ -1703,25 +1710,29 @@
 
         const cards = [
             { label: "Classrooms", value: Object.keys(state.rooms).length,
-              note: "Registered rooms", dark: true, bars: [50, 80, 40, 95, 60] },
+              note: "Registered rooms", dark: true, bars: [50, 80, 40, 95, 60],
+              href: isHead ? "reports.html?view=rooms" : "#roomCards" },
             isHead
                 ? { label: "Awaiting Verification", value: pending,
-                    note: pending ? "Needs your review" : "All caught up", bars: [30, 70, 45, 85, 55] }
+                    note: pending ? "Needs your review" : "All caught up", bars: [30, 70, 45, 85, 55],
+                    href: "reports.html?view=verification" }
                 : { label: "My Open Reports", value: open,
-                    note: open ? "Not yet completed" : "No open problems", bars: [30, 70, 45, 85, 55] },
+                    note: open ? "Not yet completed" : "No open problems", bars: [30, 70, 45, 85, 55],
+                    href: "my-reports.html" },
             { label: isHead ? "Completed Repairs" : "My Completed Repairs", value: completed,
-              note: "Marked Completed", bars: [40, 55, 75, 60, 90] }
+              note: "Marked Completed", bars: [40, 55, 75, 60, 90],
+              href: isHead ? "reports.html?view=completed" : "my-reports.html?filter=Completed" }
         ];
 
         container.innerHTML = cards.map(function (card) {
 
-            return '<div class="stat-card' + (card.dark ? " stat-dark" : "") + '">' +
+            return '<a class="stat-card stat-link' + (card.dark ? " stat-dark" : "") + '" href="' + card.href + '">' +
                 '<div class="stat-label">' + escapeHtml(card.label) + "</div>" +
                 '<div class="stat-value">' + card.value + "</div>" +
-                '<div class="stat-note">' + escapeHtml(card.note) + "</div>" +
+                '<div class="stat-note">' + escapeHtml(card.note) + " →</div>" +
                 '<div class="stat-bars">' + card.bars.map(function (h) {
                     return '<span style="height:' + h + '%"></span>';
-                }).join("") + "</div></div>";
+                }).join("") + "</div></a>";
 
         }).join("");
 
@@ -1731,6 +1742,7 @@
     function markActiveNav() {
 
         const wanted = /^(room-)?reports/.test(PAGE) ? "goToReports()"
+            : /^my-reports/.test(PAGE) ? "goToMyReports()"
             : /^dashboard/.test(PAGE) ? "goToDashboard()"
             : null;
 
@@ -1760,6 +1772,9 @@
         renderHeadReports();
         renderRoomBadges();
         renderRoomReports();
+        renderReportsHub();
+        renderMyReports();
+        renderNotifications();
         renderHistoryTitle();
         renderHeadSummary();
         renderReportDetails();
@@ -1895,6 +1910,510 @@
     }
 
     /* =====================================================
+       REPORTS HUB  (School Head: rooms view + activity log views)
+    ===================================================== */
+
+    let reportView = (new URLSearchParams(window.location.search).get("view") || "rooms").toLowerCase();
+
+    function reportViews() {
+
+        return [
+            { key: "rooms", label: "Rooms" },
+            { key: "all", label: "All Activity" },
+            { key: "verification", label: "Needs Verification", stage: "Pending" },
+            { key: "verified", label: "Verified", stage: "Verified" },
+            { key: "in-progress", label: "In Progress", stage: "In Progress" },
+            { key: "completed", label: "Completed", stage: "Completed" }
+        ];
+
+    }
+
+    function lastActivity(report) {
+
+        const last = report.statusHistory[report.statusHistory.length - 1];
+
+        return last && last.date ? last.date : report.dateReported;
+
+    }
+
+    function viewReports(view) {
+
+        return state.reports.filter(function (report) {
+            return !view.stage || reportStage(report) === view.stage;
+        }).sort(function (a, b) {
+
+            const key = view.key === "completed" ? completedDate : lastActivity;
+
+            return new Date(key(b)).getTime() - new Date(key(a)).getTime();
+
+        });
+
+    }
+
+    function setReportView(key) {
+
+        reportView = key;
+
+        try {
+
+            const url = new URL(window.location.href);
+
+            url.searchParams.set("view", key);
+            window.history.replaceState(null, "", url.toString());
+
+        } catch (error) { /* address bar not available */ }
+
+        renderReportsHub();
+
+    }
+
+    function renderReportsHub() {
+
+        const chips = byId("reportViewChips");
+
+        if (!chips) return;
+
+        const views = reportViews();
+        const current = views.filter(function (view) { return view.key === reportView; })[0] || views[0];
+
+        reportView = current.key;
+
+        chips.innerHTML = views.map(function (view) {
+
+            const count = view.key === "rooms" ? ""
+                : " (" + viewReports(view).length + ")";
+
+            return '<button type="button" class="chip' + (view.key === reportView ? " is-active" : "") +
+                '" data-view="' + view.key + '">' + escapeHtml(view.label + count) + "</button>";
+
+        }).join("");
+
+        chips.querySelectorAll("[data-view]").forEach(function (chip) {
+
+            chip.addEventListener("click", function () {
+                setReportView(chip.dataset.view);
+            });
+
+        });
+
+        const isRooms = current.key === "rooms";
+
+        byId("reportRoomList").hidden = !isRooms;
+        byId("activityView").hidden = isRooms;
+
+        if (!isRooms) renderActivityList();
+
+    }
+
+    const VIEW_SUMMARY = {
+        "all": ["ALL ACTIVITY", "Every report from every classroom, latest activity first", ""],
+        "verification": ["NEEDS VERIFICATION", "Reports waiting for your review", "tone-amber"],
+        "verified": ["VERIFIED REPORTS", "Verified and waiting for repair", ""],
+        "in-progress": ["IN PROGRESS", "Repairs that are being worked on", "tone-blue"],
+        "completed": ["TOTAL COMPLETED REPORTS", "All completed maintenance records", ""]
+    };
+
+    function renderActivityList() {
+
+        const list = byId("activityList");
+
+        if (!list || reportView === "rooms") return;
+
+        const view = reportViews().filter(function (item) { return item.key === reportView; })[0];
+        const all = viewReports(view);
+        const term = (byId("activitySearch").value || "").toLowerCase().trim();
+
+        const shown = all.filter(function (report) {
+
+            if (!term) return true;
+
+            return [report.item, report.itemDetail, report.defectKind, report.concern,
+                report.description, report.room, reporterName(report)]
+                .join(" ").toLowerCase().indexOf(term) !== -1;
+
+        });
+
+        const summary = VIEW_SUMMARY[view.key];
+
+        byId("activitySummary").className = "summary-card " + summary[2];
+        byId("activitySummary").innerHTML = "<span>" + escapeHtml(summary[0]) + "</span><strong>" +
+            all.length + "</strong><small>" + escapeHtml(summary[1]) + "</small>";
+
+        byId("activitySearch").placeholder = "Search " + view.label.toLowerCase() + " reports...";
+
+        if (shown.length === 0) {
+
+            list.innerHTML = '<p class="empty-note">' + (all.length === 0
+                ? "Nothing here yet."
+                : "No reports match your search.") + "</p>";
+
+            return;
+
+        }
+
+        list.innerHTML = shown.map(function (report) {
+
+            const stage = reportStage(report);
+            const room = state.rooms[report.roomNumber];
+            const done = stage === "Completed" ? completedDate(report) : "";
+            const last = report.statusHistory[report.statusHistory.length - 1];
+
+            const rightLabel = done ? "Date Completed" : "Last Update";
+            const rightValue = done
+                ? formatDate(done)
+                : (last ? last.status + " · " : "") + formatDate(lastActivity(report));
+
+            return '<div class="activity-card">' +
+                '<div class="report-row-top"><h3>' + escapeHtml(reportTitle(report)) + "</h3>" +
+                '<span class="stage-pill stage-' + statusClass(stage) + '">' + escapeHtml(stage) + "</span></div>" +
+                '<p class="report-row-meta">' + escapeHtml(report.room) +
+                (room ? " • " + escapeHtml(room.building) : "") + " · Reported by " +
+                escapeHtml(reporterName(report)) + "</p>" +
+                '<div class="activity-dates"><div><small>Date Reported</small><strong>' +
+                escapeHtml(formatDate(report.dateReported)) + "</strong></div>" +
+                '<div class="is-right"><small>' + rightLabel + "</small><strong>" +
+                escapeHtml(rightValue) + "</strong></div></div>" +
+                '<button type="button" class="view-details" data-report-id="' + escapeHtml(report.id) +
+                '">View Report Details →</button></div>';
+
+        }).join("");
+
+        list.querySelectorAll("[data-report-id]").forEach(function (button) {
+
+            button.addEventListener("click", function () {
+                openReportById(button.dataset.reportId);
+            });
+
+        });
+
+    }
+
+
+    /* =====================================================
+       MY REPORTS  (teacher: only the problems they reported)
+    ===================================================== */
+
+    let myReportFilter = (function () {
+
+        const wanted = new URLSearchParams(window.location.search).get("filter") || "All";
+
+        return ["All", "Pending", "Verified", "In Progress", "Completed"].indexOf(wanted) === -1
+            ? "All" : wanted;
+
+    })();
+
+    function completedDate(report) {
+
+        for (let i = report.statusHistory.length - 1; i >= 0; i--) {
+
+            if (report.statusHistory[i].status === "Completed") {
+                return report.statusHistory[i].date;
+            }
+
+        }
+
+        return report.actualCompletion || "";
+
+    }
+
+    function reportDetailsHtml(report) {
+
+        const rows = [
+            ["Item", itemLabel(report)],
+            ["Concern", report.concern],
+            ["Kind of defect", report.defectKind],
+            ["Quantity", report.quantity],
+            ["Recommended action", report.action],
+            ["Description", report.description]
+        ].filter(function (row) { return row[1] !== "" && row[1] !== undefined; });
+
+        const timeline = report.statusHistory.map(function (entry) {
+
+            return "<li><strong>" + escapeHtml(entry.status) + "</strong> · " +
+                escapeHtml(formatDate(entry.date)) + "</li>";
+
+        }).join("");
+
+        return '<dl class="report-facts">' + rows.map(function (row) {
+
+            return "<dt>" + escapeHtml(row[0]) + "</dt><dd>" + escapeHtml(String(row[1])) + "</dd>";
+
+        }).join("") + "</dl>" +
+            (report.photo ? '<img class="report-photo" alt="Report photo" src="' + escapeHtml(report.photo) + '">' : "") +
+            '<h4 class="timeline-title">Progress</h4><ul class="report-timeline">' + timeline + "</ul>";
+
+    }
+
+    function renderMyReports() {
+
+        const list = byId("myReportsList");
+
+        if (!list) return;
+
+        const reports = state.reports.slice().sort(newestFirst);
+
+        const count = function (stage) {
+            return reports.filter(function (report) { return reportStage(report) === stage; }).length;
+        };
+
+        byId("myStats").innerHTML = [
+            { label: "Total Reports", value: reports.length, tone: "" },
+            { label: "Pending Review", value: count("Pending"), tone: "tone-amber" },
+            { label: "In Progress", value: count("In Progress"), tone: "tone-blue" },
+            { label: "Completed", value: count("Completed"), tone: "tone-green" }
+        ].map(function (stat) {
+
+            return '<div class="stat-card"><div class="stat-label">' + escapeHtml(stat.label) +
+                '</div><div class="stat-value ' + stat.tone + '">' + stat.value + "</div></div>";
+
+        }).join("");
+
+        byId("myReportFilters").innerHTML = ["All"].concat(STAGES).map(function (name) {
+
+            return '<button type="button" class="chip' + (name === myReportFilter ? " is-active" : "") +
+                '" data-filter="' + escapeHtml(name) + '">' + escapeHtml(name) + "</button>";
+
+        }).join("");
+
+        byId("myReportFilters").querySelectorAll("[data-filter]").forEach(function (chip) {
+
+            chip.addEventListener("click", function () {
+                myReportFilter = chip.dataset.filter;
+                renderMyReports();
+            });
+
+        });
+
+        renderMyReportList();
+
+    }
+
+    function renderMyReportList() {
+
+        const list = byId("myReportsList");
+
+        if (!list) return;
+
+        const term = (byId("myReportSearch").value || "").toLowerCase().trim();
+        const all = state.reports.slice().sort(newestFirst);
+
+        // Keep the details that are open while the list refreshes.
+        const open = {};
+
+        list.querySelectorAll("details[open][data-id]").forEach(function (el) {
+            open[el.dataset.id] = true;
+        });
+
+        const shown = all.filter(function (report) {
+
+            if (myReportFilter !== "All" && reportStage(report) !== myReportFilter) return false;
+
+            if (!term) return true;
+
+            return [report.item, report.itemDetail, report.defectKind, report.concern,
+                report.description, report.room].join(" ").toLowerCase().indexOf(term) !== -1;
+
+        });
+
+        setText("myReportCount", all.length + (all.length === 1 ? " report" : " reports"));
+
+        if (shown.length === 0) {
+
+            list.innerHTML = '<p class="empty-note">' + (all.length === 0
+                ? "You haven't reported any problems yet."
+                : "No reports match your search or filter.") + "</p>";
+
+            return;
+
+        }
+
+        list.innerHTML = shown.map(function (report) {
+
+            const stage = reportStage(report);
+            const room = state.rooms[report.roomNumber];
+            const done = stage === "Completed" ? completedDate(report) : "";
+
+            return '<div class="report-row">' +
+                '<div class="report-row-top"><h3>' + escapeHtml(reportTitle(report)) + "</h3>" +
+                '<span class="stage-pill stage-' + statusClass(stage) + '">' + escapeHtml(stage) + "</span></div>" +
+                '<p class="report-row-meta">' + escapeHtml(report.room) +
+                (room ? " • " + escapeHtml(room.building) : "") + "</p>" +
+                '<div class="report-row-bottom"><span>Reported ' + escapeHtml(formatDate(report.dateReported)) +
+                (done ? " · Completed " + escapeHtml(formatDate(done)) : "") + "</span></div>" +
+                '<details class="report-more" data-id="' + escapeHtml(report.id) + '"' +
+                (open[report.id] ? " open" : "") + "><summary>View Details</summary>" +
+                reportDetailsHtml(report) + "</details></div>";
+
+        }).join("");
+
+    }
+
+
+    /* =====================================================
+       NOTIFICATIONS  (teacher: the School Head changed a report)
+    ===================================================== */
+
+    const notifState = { signatures: null };
+
+    function notifKey() {
+
+        return "buildsafe.notifRead." + (state.session ? state.session.uid : "");
+
+    }
+
+    function getReadAt() {
+
+        try {
+
+            let value = window.localStorage.getItem(notifKey());
+
+            // First visit on this device: only changes from now on are "new".
+            if (!value) {
+
+                value = new Date().toISOString();
+                window.localStorage.setItem(notifKey(), value);
+
+            }
+
+            return new Date(value).getTime();
+
+        } catch (error) {
+
+            return Date.now();
+
+        }
+
+    }
+
+    function markNotificationsRead() {
+
+        try {
+            window.localStorage.setItem(notifKey(), new Date().toISOString());
+        } catch (error) { /* storage unavailable */ }
+
+        renderNotifications();
+
+    }
+
+    function changeMessage(status) {
+
+        const messages = {
+            "Report Verified": "was verified by the School Head",
+            "Scheduled": "was scheduled for repair",
+            "In Progress": "is now In Progress",
+            "Completed": "was marked Completed"
+        };
+
+        return messages[status] || "changed to " + status;
+
+    }
+
+    // Every change the School Head made, newest first.
+    function notificationItems() {
+
+        const items = [];
+
+        state.reports.forEach(function (report) {
+
+            report.statusHistory.forEach(function (entry) {
+
+                if (entry.status === "Report Submitted") return;
+
+                items.push({ report: report, status: entry.status, date: entry.date });
+
+            });
+
+        });
+
+        items.sort(function (a, b) {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+        });
+
+        return items.slice(0, 30);
+
+    }
+
+    function renderNotifications() {
+
+        const bell = byId("notifBell");
+
+        if (!bell || !state.session || state.session.role !== ROLES.TEACHER) return;
+
+        const readAt = getReadAt();
+        const items = notificationItems();
+        const unread = items.filter(function (item) {
+            return new Date(item.date).getTime() > readAt;
+        });
+
+        const badge = byId("notifCount");
+
+        badge.textContent = unread.length > 9 ? "9+" : String(unread.length);
+        badge.hidden = unread.length === 0;
+
+        byId("notifList").innerHTML = items.length === 0
+            ? '<p class="empty-note">No updates yet. You will be notified when the School Head changes the status of a report.</p>'
+            : items.map(function (item) {
+
+                const isNew = new Date(item.date).getTime() > readAt;
+
+                return '<div class="notif-item' + (isNew ? " is-new" : "") + '">' +
+                    "<strong>" + escapeHtml(item.report.room) + " · " + escapeHtml(itemLabel(item.report)) + "</strong>" +
+                    "<span>" + escapeHtml("Report " + changeMessage(item.status)) + "</span>" +
+                    "<small>" + escapeHtml(formatDate(item.date)) + "</small></div>";
+
+            }).join("");
+
+    }
+
+    // Pop-up message when a status changes while the teacher has the page open.
+    function announceChanges(reports) {
+
+        if (!state.session || state.session.role !== ROLES.TEACHER) return;
+
+        const next = {};
+
+        reports.forEach(function (report) {
+
+            const last = report.statusHistory[report.statusHistory.length - 1];
+
+            next[report.id] = last ? last.status + "|" + last.date : "";
+
+            if (!notifState.signatures || !last) return;
+
+            const before = notifState.signatures[report.id];
+
+            if (before !== undefined && before !== next[report.id] && last.status !== "Report Submitted") {
+
+                notify(report.room + " · " + itemLabel(report) + ": report " +
+                    changeMessage(last.status) + ".", "success");
+
+            }
+
+        });
+
+        notifState.signatures = next;
+
+    }
+
+    function toggleNotifications(event) {
+
+        if (event) event.stopPropagation();
+
+        const panel = byId("notifPanel");
+
+        if (panel) panel.hidden = !panel.hidden;
+
+    }
+
+    document.addEventListener("click", function (event) {
+
+        const panel = byId("notifPanel");
+
+        if (panel && !panel.hidden && !event.target.closest(".notif-wrap")) panel.hidden = true;
+
+    });
+
+    /* =====================================================
        PROFILE CHIP  (who is logged in, top right of every page)
     ===================================================== */
 
@@ -1923,7 +2442,30 @@
             (roleLabel && roleLabel !== name ? "<small>" + escapeHtml(roleLabel) + "</small>" : "") +
             "</span>";
 
-        host.insertBefore(chip, host.firstChild);
+        const bar = document.createElement("div");
+
+        bar.className = "topbar";
+
+        if (session.role === ROLES.TEACHER) {
+
+            const wrap = document.createElement("div");
+
+            wrap.className = "notif-wrap";
+            wrap.innerHTML =
+                '<button type="button" class="notif-bell" id="notifBell" aria-label="Notifications" onclick="toggleNotifications(event)">' +
+                '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>' +
+                '<span class="notif-count" id="notifCount" hidden>0</span></button>' +
+                '<div class="notif-panel" id="notifPanel" hidden>' +
+                '<div class="notif-head"><strong>Notifications</strong>' +
+                '<button type="button" class="notif-read" onclick="markNotificationsRead()">Mark all as read</button></div>' +
+                '<div id="notifList"></div></div>';
+
+            bar.appendChild(wrap);
+
+        }
+
+        bar.appendChild(chip);
+        host.insertBefore(bar, host.firstChild);
 
     }
 
@@ -1946,6 +2488,8 @@
             },
 
             onReports: function (reports) {
+
+                announceChanges(reports);
 
                 state.reports = reports;
                 state.loaded.reports = true;
@@ -2034,6 +2578,11 @@
         goToReports: goToReports,
         openInventory: openInventory,
         openReport: openReport,
+        goToMyReports: goToMyReports,
+        renderMyReportList: renderMyReportList,
+        renderActivityList: renderActivityList,
+        toggleNotifications: toggleNotifications,
+        markNotificationsRead: markNotificationsRead,
         goBackToRoomReports: goBackToRoomReports,
         renderRoomReportList: renderRoomReportList,
         openReportById: openReportById,

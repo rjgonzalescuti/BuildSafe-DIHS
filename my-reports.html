@@ -1,0 +1,64 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuildSafe DIHS - My Reports</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="theme.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+
+        <h1>BuildSafe DIHS</h1>
+
+        <p>Digital Classroom Inventory System</p>
+
+        <button onclick="goToDashboard()">Dashboard</button>
+        <button onclick="goToClassroom()">Classroom</button>
+        <button onclick="goToMyReports()">My Reports</button>
+        <button onclick="logout()">Logout</button>
+
+    </aside>
+
+    <main class="main-content">
+
+        <h1>My Reports</h1>
+
+        <p>Every problem you have reported, and what the School Head did about it.</p>
+
+        <div class="stat-grid stat-grid-4" id="myStats"></div>
+
+        <section class="Report-box">
+
+            <div class="report-header">
+                <h2>My Reported Problems</h2>
+                <span class="new-report-badge" id="myReportCount">0 reports</span>
+            </div>
+
+            <input type="text" id="myReportSearch" class="report-search"
+                   placeholder="Search my reports..." oninput="renderMyReportList()">
+
+            <div class="chip-row" id="myReportFilters"></div>
+
+            <div id="myReportsList"></div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="firebase-config.js"></script>
+<script src="store.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>

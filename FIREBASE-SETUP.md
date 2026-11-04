@@ -226,3 +226,32 @@ Every page shows a small profile badge at the top right with the person's initia
 and role. The name comes from the `displayName` field of their document in the `users`
 collection, so set a real name there (for example `Mrs. Santos`). Without one, the app
 falls back to the account's email.
+
+### Teacher "My Reports" page and notifications
+
+* **My Reports** (teacher sidebar): every problem the teacher reported, with counts, search,
+  filters (All, Pending, Verified, In Progress, Completed) and **View Details**, which opens
+  the full report and its progress timeline. A teacher never sees other teachers' reports.
+* **Notification bell** (top right, teachers only): a red number shows how many changes the
+  School Head has made to the teacher's reports since they last pressed **Mark all as read**.
+  Changes are: verified, scheduled, in progress, completed. If the page is open when the
+  School Head changes a status, a pop-up message also appears.
+* The "read" mark is saved in the browser on that device, so the same teacher on a second
+  phone or computer sees those notifications as new there too.
+
+No Firebase change is needed for this feature: it reads each report's `statusHistory`,
+which the app already saves whenever the School Head updates a report.
+
+### Reports page filters (School Head)
+
+The **Reports** page has filter buttons: **Rooms** (the classroom list), **All Activity**,
+**Needs Verification**, **Verified**, **In Progress** and **Completed**. Every view except
+Rooms is one list of reports from all classrooms (not split by room), newest activity first,
+with a search box. Each card shows the dates and **View Report Details**.
+
+The cards on the School Head dashboard are links: Classrooms opens the Rooms view,
+Awaiting Verification opens Needs Verification, and Completed Repairs opens Completed.
+A page can also be opened directly with `reports.html?view=completed` (or `verification`,
+`verified`, `in-progress`, `all`, `rooms`).
+
+No Firebase change is needed for this feature.

@@ -44,7 +44,22 @@
                 </span>
             </div>
 
+            <div class="chip-row" id="reportViewChips"></div>
+
+            <!-- Rooms view: one row per classroom -->
             <div id="reportRoomList"></div>
+
+            <!-- Activity views: every report from every room, newest activity first -->
+            <div id="activityView" hidden>
+
+                <div class="summary-card" id="activitySummary"></div>
+
+                <input type="text" id="activitySearch" class="report-search"
+                       placeholder="Search reports..." oninput="renderActivityList()">
+
+                <div id="activityList"></div>
+
+            </div>
 
         </div>
 
